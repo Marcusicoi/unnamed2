@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://marcusicoi.glitch.me/icon.png" />
 
+    <title></title>
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="https://marcusicoi.github.io/unnamed/style.css" />
+    <link rel="stylesheet" media="screen" href="https://fonts.cdnfonts.com/css/clear-sans" type="text/css"/>
+    <!-- import the webpage's javascript file -->
+  </head>
+  <body>
+    <!-- this is the start of content -->
+    <h1>Umamusume Audio Player</h1>
+    <input type="text" id="vol" placeholder="Volume" value="0.1">
+    <a id="button" style="background:blue;visibility:hidden">Play</a>
+    <a id="pbutton" style="background:magenta;visibility:hidden">Previous</a>
+    <a id="sbutton" style="background:yellow;visibility:hidden">Skip</a>
+    <a id="vbutton" style="background:orange">Set Volume</a>
+    <a id="fbutton" style="background:red">Favorites Only</a>
+    <h2 id="txt"></h2>
+    <h1></h1>
+    <div id="songstable">
+      <h2>Songs</h2>
+    </div>
+    <h1></h1>
+    <audio id="player" controls></audio>
+  </body>
+  <script>
+    function $(x) { return document.getElementById(x) };
+    let originalSongs = [
+    ];
+    let songs = [...originalSongs];
+    let lessFavorite = [];
+    let queue = [...songs];
+    let queueIndex = -2;
+    let loaded = 0;
+    let loadedsfx = 0;
+    let player = $("player");
+    let playersfx = (i, v) => { return $(i + "playersfx" + v) };
+    let sfxchance = 0;
+    let sfxintervals = {};
+    let sfxactive = false;
+    let sfxvolumes = [1];
+    let sfxcounter = {};
+    //Preloading
+    function preload(url) {
+      let audio = new Audio();
+      audio.src = `https://marcusicoi.github.io/unnamed/${url}.mp3`;
+      audio.addEventListener('canplaythrough', function() {
+        loaded++;
+        $("txt").innerHTML = `Loaded: ${loaded}/${originalSongs.length}`;
+        if (loaded === originalSongs.length) {
+          $("button").style.visibility = "visible";
+        };
+      }, {once: true});
+    };
+    for (let i = 0; i < originalSongs.length; i++) preload(originalSongs[i]);
+    
+    //Filtering
+    for (let s of originalSongs) {
+      let a = document.createElement("a");
+      a.style.background = "blue";
+      a.className = "songs";
+      a.innerHTML = s;
+      a.onclick = function() {
+        if (songs.indexOf(s) > -1) {
+          songs.splice(songs.indexOf(s), 1);
+          a.style.background = "red";
+          $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+        } else {
+          songs.push(s);
+          a.style.background = "blue";
+          $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+        };
+      };
+      a.oncontextmenu = function(e) {
+        queueIndex = -2
+        player.src = "https://marcusicoi.github.io/unnamed/" + s + ".mp3";
+        player.volume = +$("vol").value;
+        player.play();
+        $("txt").innerHTML = "Playing: " + s;
+        e.preventDefault();
+      };
+      $("songstable").appendChild(a);
+    };
+    
+    //Playing
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      };
+      return arr;
+    };
+    function playRandomSong() {
+      if (queueIndex !== -2) {
+        queueIndex++;
+        if (queueIndex >= queue.length) queueIndex = 0;
+        player.src = "https://marcusicoi.github.io/unnamed/" + songs[songs.indexOf(queue[queueIndex])] + ".mp3";
+        $("txt").innerHTML = "Playing: " + songs[songs.indexOf(queue[queueIndex])];
+      };
+      player.volume = +$("vol").value;
+      player.play();
+    };
+    $("button").onclick = function() {
+      queue = [...songs];
+      shuffle(queue);
+      queueIndex = 0;
+      playRandomSong();
+      $("pbutton").style.visibility = "visible";
+      $("sbutton").style.visibility = "visible";
+    };
+    $("pbutton").onclick = function() {
+      queueIndex -= 2;
+      if (queueIndex < 0) queueIndex = 0;
+      playRandomSong();
+    };
+    $("sbutton").onclick = function() {
+      playRandomSong();
+    };
+    $("vbutton").onclick = function() {
+      player.volume = +$("vol").value;
+    };
+    $("fbutton").onclick = function() {
+      for (let ls of lessFavorite) document.getElementsByClassName("songs")[originalSongs.indexOf(ls)].click();
+      $("txt").innerHTML = `Loaded: ${loaded}/${songs.length}`;
+    };
+    player.addEventListener("ended", playRandomSong);
+  </script>
+</html>
