@@ -58,7 +58,7 @@
     //Preloading
     function preload(url) {
       let audio = new Audio();
-      audio.src = `https://marcusicoi.github.io/unnamed/${url}.mp3`;
+      audio.src = `https://marcusicoi.github.io/unnamed2/${url}.mp3`;
       audio.addEventListener('canplaythrough', function() {
         loaded++;
         $("txt").innerHTML = `Loaded: ${loaded}/${originalSongs.length}`;
@@ -88,7 +88,7 @@
       };
       a.oncontextmenu = function(e) {
         queueIndex = -2
-        player.src = "https://marcusicoi.github.io/unnamed/" + s + ".mp3";
+        player.src = "https://marcusicoi.github.io/unnamed2/" + s + ".mp3";
         player.volume = +$("vol").value;
         player.play();
         $("txt").innerHTML = "Playing: " + s;
@@ -109,7 +109,7 @@
       if (queueIndex !== -2) {
         queueIndex++;
         if (queueIndex >= queue.length) queueIndex = 0;
-        player.src = "https://marcusicoi.github.io/unnamed/" + songs[songs.indexOf(queue[queueIndex])] + ".mp3";
+        player.src = "https://marcusicoi.github.io/unnamed2/" + songs[songs.indexOf(queue[queueIndex])] + ".mp3";
         $("txt").innerHTML = "Playing: " + songs[songs.indexOf(queue[queueIndex])];
       };
       player.volume = +$("vol").value;
